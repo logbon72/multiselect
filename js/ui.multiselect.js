@@ -22,6 +22,7 @@
  * Todo:
  *  Make batch actions faster
  *  Implement dynamic insertion through remote calls
+ * 
  */
 
 
@@ -39,15 +40,29 @@ $.widget("ui.multiselect", {
 			var text1 = node1.text(),
 			    text2 = node2.text();
 			return text1 == text2 ? 0 : (text1 < text2 ? -1 : 1);
-		}
+		},
+        reverseOrder: false     //this is changes the layout of the multiselect container, making the available list come first if true
 	},
 	_create: function() {
 		this.element.hide();
+        if(this.options.reverseOrder){
+            this.options.dividerLocation = 1 - this.options.dividerLocation;
+        }
 		this.id = this.element.attr("id");
 		this.container = $('<div class="ui-multiselect ui-helper-clearfix ui-widget"></div>').insertAfter(this.element);
 		this.count = 0; // number of currently selected options
-		this.selectedContainer = $('<div class="selected"></div>').appendTo(this.container);
-		this.availableContainer = $('<div class="available"></div>').appendTo(this.container);
+        //check for reversed order!
+		this.selectedContainer = (this.options.reverseOrder)?
+                                    $('<div class="selected"></div>').prependTo(this.container):
+                                    $('<div class="selected"></div>').appendTo(this.container);
+        
+        //check for reversed order
+                                    
+		this.availableContainer = (this.options.reverseOrder)?
+                                    $('<div class="available" style="border-left: 0; border-right: 1px solid"></div>').prependTo(this.container):
+                                    $('<div class="available"></div>').appendTo(this.container); 
+        
+        
 		this.selectedActions = $('<div class="actions ui-widget-header ui-helper-clearfix"><span class="count">0 '+$.ui.multiselect.locale.itemsCount+'</span><a href="#" class="remove-all">'+$.ui.multiselect.locale.removeAll+'</a></div>').appendTo(this.selectedContainer);
 		this.availableActions = $('<div class="actions ui-widget-header ui-helper-clearfix"><input type="text" class="search empty ui-widget-content ui-corner-all"/><a href="#" class="add-all">'+$.ui.multiselect.locale.addAll+'</a></div>').appendTo(this.availableContainer);
 		this.selectedList = $('<ul class="selected connected-list"><li class="ui-helper-hidden-accessible"></li></ul>').bind('selectstart', function(){return false;}).appendTo(this.selectedContainer);
