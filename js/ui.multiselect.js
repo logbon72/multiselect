@@ -41,7 +41,9 @@ $.widget("ui.multiselect", {
 			    text2 = node2.text();
 			return text1 == text2 ? 0 : (text1 < text2 ? -1 : 1);
 		},
-        reverseOrder: false     //this is changes the layout of the multiselect container, making the available list come first if true
+        reverseOrder: false,
+        width: 0,
+        height: 0
 	},
 	_create: function() {
 		this.element.hide();
@@ -59,7 +61,7 @@ $.widget("ui.multiselect", {
         //check for reversed order
                                     
 		this.availableContainer = (this.options.reverseOrder)?
-                                    $('<div class="available" style="border-left: 0; border-right: 1px solid"></div>').prependTo(this.container):
+                                    $('<div class="available reversed"></div>').prependTo(this.container):
                                     $('<div class="available"></div>').appendTo(this.container); 
         
         
@@ -71,13 +73,17 @@ $.widget("ui.multiselect", {
 		var that = this;
 
 		// set dimensions
-		this.container.width(this.element.width()+1);
-		this.selectedContainer.width(Math.floor(this.element.width()*this.options.dividerLocation));
-		this.availableContainer.width(Math.floor(this.element.width()*(1-this.options.dividerLocation)));
+		var useWidth = (this.options.width > 0)? this.options.width :this.element.width();;
+		var useHeight = (this.options.height > 0)? this.options.height: this.element.height();  
+		//alert(this.options.height);
+        
+        this.container.width(useWidth+2);
+		this.selectedContainer.width(Math.floor(useWidth*this.options.dividerLocation));
+		this.availableContainer.width(Math.floor(useWidth*(1-this.options.dividerLocation)));
 
 		// fix list height to match <option> depending on their individual header's heights
-		this.selectedList.height(Math.max(this.element.height()-this.selectedActions.height(),1));
-		this.availableList.height(Math.max(this.element.height()-this.availableActions.height(),1));
+		this.selectedList.height(Math.max(useHeight-this.selectedActions.height(),1));
+		this.availableList.height(Math.max(useHeight-this.availableActions.height(),1));
 		
 		if ( !this.options.animated ) {
 			this.options.show = 'show';
